@@ -1,4 +1,5 @@
 import sys
+import os
 
 class BrainfuckException(Exception):
     def __init__(self, value):
@@ -9,7 +10,7 @@ class BrainfuckException(Exception):
 
 class BrainfuckMemory():
     MAX = 3000
-    
+
     def __init__(self):
         self.index = 0
         self.cells = []
@@ -21,7 +22,7 @@ class BrainfuckMemory():
             self.index += 1
         else:
             raise BrainfuckException('Index cross maximum value')
-        
+
     def decrementIndex(self):
         if self.index > 0:
             self.index -= 1
@@ -88,11 +89,11 @@ class BrainfuckJumpCommand(BrainfuckCommand):
     def __init__(self, character):
         BrainfuckCommand.__init__(self, character)
         self.jumpTo = self.VOID_POINTER
-        
+
     def getJumpIndex(self):
         if self.jumpTo > self.VOID_POINTER:
             return self.jumpTo
-        
+
         raise BrainfuckException('Jump index was not set')
 
     def setJumpIndex(self, jumpToIndex):
@@ -120,7 +121,7 @@ class BrainfuckProgram():
         except Exception as exception:
            command = self.commands[index].character
            raise BrainfuckException('Runtime error: "' + str(exception) + '". Operation: "' + command + '". Operation index: ' + str(index) + '.')
-        
+
     def _runCommand(self, index):
         command = self.commands[index]
         result = command.execute(self.memory)
@@ -143,16 +144,16 @@ class BrainfuckProgramBuilder():
         elif commandCharacter == ']':
             command = BrainfuckJumpCommand(commandCharacter)
             command.setSelfIndex(self.index)
-            
+
             opening = self.jumpStack.pop()
             command.setJumpIndex(opening.getSelfIndex())
-            opening.setJumpIndex(command.getSelfIndex())            
-        else: 
+            opening.setJumpIndex(command.getSelfIndex())
+        else:
             raise BrainfuckException("Unknown operation character: '" + commandCharacter + "'")
 
         self._appendCommand(command)
 
-    def _appendCommand(self, command):        
+    def _appendCommand(self, command):
         self.index += 1
         self.operations.append(command)
 
@@ -163,17 +164,17 @@ class BrainfuckProgramBuilder():
         return BrainfuckProgram(self.operations, memory)
 
 class BrainfuckParser():
-    def __init__(self):    
+    def __init__(self):
         pass
-    
+
     def parse(self, inputStream):
         self._prepearEnvariement()
-        
+
         for line in inputStream:
             for character in line:
                 if not self._isCharacterOperation(character):
                     continue
-                
+
                 self.programBuilder.buildCommand(character)
 
         return self.programBuilder
@@ -185,7 +186,7 @@ class BrainfuckParser():
         return '+-<>[],.'.find(character) > -1
 
 if len(sys.argv) > 1:
-    programFile = open(sys.argv[1], 'r')
+    programFile = open(os.path.abspath(sys.argv[1]), 'r')
     parser = BrainfuckParser()
 
     builder = parser.parse(programFile)
@@ -194,4 +195,3 @@ if len(sys.argv) > 1:
     program.run()
 else:
     print('Please use: brainfuck.py <file>')
-
