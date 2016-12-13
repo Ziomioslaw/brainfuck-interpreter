@@ -7,7 +7,7 @@ class BrainfuckException(Exception):
     def __str__(self):
         return repr(self.value)
 
-class BrainfuckMemory():
+class Memory():
     MAX = 3000
 
     def __init__(self):
@@ -52,7 +52,7 @@ class BrainfuckMemory():
         else:
             raise BrainfuckException('Memory read index invaild value')
 
-class BrainfuckCommand():
+class Command():
     VOID_POINTER = -1
 
     def __init__(self, character):
@@ -84,9 +84,9 @@ class BrainfuckCommand():
 
         return -1
 
-class BrainfuckJumpCommand(BrainfuckCommand):
+class JumpCommand(Command):
     def __init__(self, character):
-        BrainfuckCommand.__init__(self, character)
+        Command.__init__(self, character)
         self.jumpTo = self.VOID_POINTER
 
     def getJumpIndex(self):
@@ -107,7 +107,7 @@ class BrainfuckJumpCommand(BrainfuckCommand):
 
         return -1
 
-class BrainfuckProgram():
+class Program():
     def __init__(self, commands, memory):
         self.commands = commands
         self.memory = memory
@@ -126,7 +126,7 @@ class BrainfuckProgram():
         result = command.execute(self.memory)
         return result if result != -1 else (index + 1)
 
-class BrainfuckProgramBuilder():
+class ProgramBuilder():
     def __init__(self):
         self.operations = []
         self.index = 0
@@ -134,14 +134,14 @@ class BrainfuckProgramBuilder():
 
     def buildCommand(self, commandCharacter):
         if '+-<>,.'.find(commandCharacter) > -1:
-            command = BrainfuckCommand(commandCharacter)
+            command = Command(commandCharacter)
             command.setSelfIndex(self.index)
         elif commandCharacter == '[':
-            command = BrainfuckJumpCommand(commandCharacter)
+            command = JumpCommand(commandCharacter)
             command.setSelfIndex(self.index)
             self.jumpStack.append(command)
         elif commandCharacter == ']':
-            command = BrainfuckJumpCommand(commandCharacter)
+            command = JumpCommand(commandCharacter)
             command.setSelfIndex(self.index)
 
             opening = self.jumpStack.pop()
@@ -159,10 +159,10 @@ class BrainfuckProgramBuilder():
     def __len__(self):
         return self.index
 
-    def getBrainfuckProgram(self, memory):
-        return BrainfuckProgram(self.operations, memory)
+    def getProgram(self, memory):
+        return Program(self.operations, memory)
 
-class BrainfuckParser():
+class Parser():
     def __init__(self):
         pass
 
@@ -179,7 +179,7 @@ class BrainfuckParser():
         return self.programBuilder
 
     def _prepearEnvariement(self):
-        self.programBuilder = BrainfuckProgramBuilder()
+        self.programBuilder = ProgramBuilder()
 
     def _isCharacterOperation(self, character):
         return '+-<>[],.'.find(character) > -1
