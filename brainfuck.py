@@ -8,8 +8,8 @@ if len(sys.argv) > 1:
     parser = brainfuckinterpreter.Parser()
 
     builder = parser.parse(programFile)
-    program = builder.getProgram(brainfuckinterpreter.Memory())
+    program = builder.getProgram()
 
-    program.run()
+    program.run(brainfuckinterpreter.Memory(), sys.stdout, sys.stdin)
 else:
     print('Please use: brainfuck.py <file>')

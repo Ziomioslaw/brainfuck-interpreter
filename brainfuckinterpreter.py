@@ -1,5 +1,3 @@
-import sys
-
 class BrainfuckException(Exception):
     def __init__(self, value):
         self.value = value
@@ -65,7 +63,7 @@ class Command():
     def getSelfIndex(self):
         return self.selfIndex
 
-    def execute(self, memory):
+    def execute(self, memory, outputStream, inputStream):
         if self.character == '>':
             memory.incrementIndex()
         elif self.character == '<':
@@ -75,9 +73,9 @@ class Command():
         elif self.character == '-':
             memory.decrementValue()
         elif self.character == '.':
-            sys.stdout.write(chr(memory.outputValue()))
+            outputStream.write(chr(memory.outputValue()))
         elif self.character == ',':
-            inputCharacter = sys.stdin.read(1)
+            inputCharacter = inputStream.read(1)
             memory.inputValue(ord(inputCharacter))
         else:
             raise BrainfuckException('Unknow command: "' + self.character + '"')
@@ -98,7 +96,7 @@ class JumpCommand(Command):
     def setJumpIndex(self, jumpToIndex):
         self.jumpTo = jumpToIndex
 
-    def execute(self, memory):
+    def execute(self, memory, outputStream, inputStream):
         value = memory.outputValue()
         if self.character == '[' and value == 0:
             return self.jumpTo
@@ -108,11 +106,14 @@ class JumpCommand(Command):
         return -1
 
 class Program():
-    def __init__(self, commands, memory):
+    def __init__(self, commands):
         self.commands = commands
-        self.memory = memory
 
-    def run(self):
+    def run(self, memory, outputStream, inputStream):
+        self.memory = memory
+        self.outputStream = outputStream
+        self.inputStream = inputStream
+
         try:
             index = 0
             while index < len(self.commands):
@@ -123,7 +124,7 @@ class Program():
 
     def _runCommand(self, index):
         command = self.commands[index]
-        result = command.execute(self.memory)
+        result = command.execute(self.memory, self.outputStream, self.inputStream)
         return result if result != -1 else (index + 1)
 
 class ProgramBuilder():
@@ -159,8 +160,8 @@ class ProgramBuilder():
     def __len__(self):
         return self.index
 
-    def getProgram(self, memory):
-        return Program(self.operations, memory)
+    def getProgram(self):
+        return Program(self.operations)
 
 class Parser():
     def __init__(self):
