@@ -22,9 +22,16 @@ Please use: brainfuck.py <brainfuck program file>
 Call program with brainfuck script file as first parameter. Example:
 
 ```bash
-$ python brainfuck.py brainfuckscripts/helloWorld.bf
+$ python brainfuck.py helloWorld.bf
 Hello World!
 ```
+
+## Links with brainfuck code files
+
+* [Examples from Wikipedia page](https://en.wikipedia.org/wiki/Brainfuck#Examples)
+* [Pablojorge/brainfuck programs](https://github.com/pablojorge/brainfuck/tree/master/programs)
+* [Some brainfuck fluff by daniel b cristofani](http://www.hevanet.com/cristofd/brainfuck/)
+* [Examples from Esoteric.sange.fi](http://esoteric.sange.fi/brainfuck/bf-source/prog/)
 
 ## License
 
